@@ -1,242 +1,230 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
 <style>
-
-body {
-  font-family: 'Proxima Nova', sans-serif;
+.counties {
+  fill: none;
 }
-
-.g-hed {
-  text-align: left;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size:22px;
-  margin: 3px 0;
-}
-
-.g-source-bold {
-  text-align: left;
-  font-size:10px;
-  font-weight: bold;
-}
-
-.g-source-reg {
-  text-align: left;
-  font-size:10px;
-}
-
-.g-source {
-  margin: 10px 0;
-}
-
-.g-intro {
-  font-size: 16px;
-  margin: 0px 0px 10px 0px;
-}
-
 .states {
-  fill: #d3d3d3;
-  stroke: #ffffff;
+  fill: none;
+  stroke: #fff;
   stroke-linejoin: round;
 }
-
-.q0-9 { fill: #d9e0f2; }
-.q1-9 { fill: #99b2dc; }
-.q2-9 { fill: #5e8dc9; }
-.q3-9 { fill: #2f5491; }
-.q4-9 { fill: #0e2344; }
-
-#q0-9 { background-color: #d9e0f2; }
-#q1-9 { background-color: #99b2dc; }
-#q2-9 { background-color: #5e8dc9; }
-#q3-9 { background-color: #2f5491; }
-#q4-9 { background-color: #0e2344; }
-
-div.tooltip {
-  position: absolute;
-  left: 75px;
-  text-align: center;
-  height: 12px;
-  padding: 8px;
-  font-size: 13px;
-  font-family: 'Proxima-Nova', sans-serif;
-  background: #FFFFFF;
-  border: 1px solid #989898;
-  pointer-events: none;
+.d3-tip {
+  line-height: 1;
+  padding: 12px;
+  background: rgba(43,43,43, 0.8);
+  color: #fff;
+  border-radius: 2px;
 }
-
-.block {
-  width:18%;
-  height: 15px;
-  display:inline-block;
-}
-
 </style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.js"></script>
+<script src="d3-tip.js"></script>
 <body>
-  <h5 class="g-hed"></h5>
-  <p class="g-intro"></p>
-  <div class="g-chart"></div>
-    <div class="legend">
-    <div class="block" id="q0-9"></div>
-    <div class="block" id="q1-9"></div>
-    <div class="block" id="q2-9"></div>
-    <div class="block" id="q3-9"></div>
-    <div class="block" id="q4-9"></div>
-  </div>
-  <div class="g-source"><span class="g-source-bold"></span><span class="g-source-reg"></span></div>
-</body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
-
+  <label for="selectData">Select Data Set:</label>
+	<select id="selectData"></select>
+  <label for="selectYear">Select Year:</label>
+	<select id="selectYear"></select>
+  <div id="chloropleth"><svg width="960" height="600"></svg></div>
+  <div id="graph"><svg></svg></div>
 <script>
 
-//Creates tooltip and makes it invisiblae
-var div = d3.select("body").append("div")
-  .attr("class", "tooltip")
-  .style("opacity", 0);
+// Datasets
+// FIP codes
+// https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt
+// https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code
+//
+// Unemployment rates
+// https://www.bls.gov/lau/#tables
 
-//Sets dimensions
-var margin = {top: 10, left: 10, bottom: 10, right: 10}
-  , width = window.outerWidth
-  , width = width - margin.left - margin.right
-  , mapRatio = .5
-  , height = width * mapRatio;
+// https://bl.ocks.org/mbostock/4060606
 
-//Tells the nap what projection to use
-var projection = d3.geo.albersUsa()
-    .scale(width)
-    .translate([width / 2, height / 2]);
+var colorArray = [d3.schemeCategory10, d3.schemeAccent];
 
-//Tells the map how to draw the paths from the projection
-var path = d3.geo.path()
-    .projection(projection);
+var colorScheme = d3.scaleOrdinal(colorArray[0]);
 
-//Appened svg to page
-var map = d3.select(".g-chart").append("svg")
-  .style('height', height + 'px')
-  .style('width', width + 'px');
+var svg = d3.select("#chloropleth").select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
 
-//Load the files
-queue()
-    .defer(d3.json, "https://d3js.org/us-10m.v1.json")
-    .defer(d3.csv, "maptemplate.csv")
-    .await(ready);
+var path = d3.geoPath();
 
-//Moves selection to front
-d3.selection.prototype.moveToFront = function() {
-  return this.each(function(){
-    this.parentNode.appendChild(this);
-  });
-};
+var unemployment = d3.map();
 
-//Moves selection to back
-d3.selection.prototype.moveToBack = function() {
-  return this.each(function() {
-  var firstChild = this.parentNode.firstChild;
-    if (firstChild) {
-      this.parentNode.insertBefore(this, firstChild);
+var xgraph = d3.scaleLinear()
+    .range([0, width]);
+
+var x = d3.scaleLinear()
+    .rangeRound([10, 870]);
+
+var quantile = d3.scaleQuantile();
+
+var convertN_FIP = {}
+var convertFIP_N = {}
+var convertFIP_C = {}
+var dropDownDate = d3.select("#selectYear")
+var tip = d3.tip()
+var stateData = {}
+var stateSelected = {}
+
+Promise.all([
+    // enter code to read files
+    d3.json("https://d3js.org/us-10m.v1.json"),
+    d3.csv("StatePop1969_2019.csv"),
+    d3.tsv("us-state-names.tsv")
+]).then((values) =>{
+  // enter code to call ready() with required arguments
+  var data = {}
+
+  for(i in values[2]){
+    convertN_FIP[values[2][i]["code"]] = parseInt(values[2][i]["id"])
+    convertFIP_N[parseInt(values[2][i]["id"])] = values[2][i]["name"]
+    convertFIP_C[parseInt(values[2][i]["id"])] = values[2][i]["code"]
+  }
+  var keys = Object.keys(values[1][1])
+  for(i in keys){
+    stateData[keys[i]] = []
+    stateSelected[keys[i]] = false
+  }
+  for(i in values[1]){
+    for(j in keys){
+      stateData[keys[j]].push(parseInt(values[1][i][keys[j]]))
     }
-  });
-};
+  }
+  console.log(stateSelected)
+  values[1].map(function(d){
+    for(i in d){
+      if(i == "Year"){
+        data[d["Year"]] = {}
+      }
+      else{
+        data[d["Year"]][convertN_FIP[i]] = parseInt(d[i])
+      }
+    }
+    return d;
+  })
 
-function ready(error, us, maptemplate) {
-  if (error) throw error;
+  ready("error", values[0], data, values[2])
+});
 
-  console.log(us, maptemplate);
 
-  //Sets color scale
-  var numMedian = d3.median(maptemplate, function(d) { return d.num;});
-  var quantize = d3.scale.quantize()
-    .domain([0, numMedian])
-    .range(d3.range(5).map(function(i) { return "q" + i + "-9"; }));
+function ready(error, us, data, usnames) {
+  var dates = Object.keys(data)
+  dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
 
-  //Pair data with state id
-  var dataByFIPS = {};
-  maptemplate.forEach(function(d) { dataByFIPS[d.FIPS] = +d.num; });
+  dropDownDate.on('change', function(){
+    createMapAndLegend(us, data[dropDownDate.property('value')], []);
+  })
 
-  //Pair state name with state id
-  var stateByFIPS = {};
-  maptemplate.forEach(function(d) { stateByFIPS[d.FIPS] = d.state; });
+  createMapAndLegend(us, data[dropDownDate.property('value')], [])
 
-  //Appends chart headline
-  d3.select(".g-hed").text("Map headline goes here");
 
-  //Appends chart intro text
-  d3.select(".g-intro").text("Map intro text goes here. Write a short sentence describing the map here.");
+}
 
-  //Append states
-  map.append("g")
-    .attr("class", "states")
+function createMapAndLegend(us, data, stateData){
+  for(i in stateSelected){
+    stateSelected[i] = false
+  }
+  svg.remove()
+  svg = d3.select("#chloropleth").append("svg").attr("width", width).attr("height", height)
+  var min = Math.min.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+  var max = Math.max.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+  // Create element for legend
+  var g = d3.select("#chloropleth")
+  g.select("#scale").remove()
+  g = g.append("svg").attr("width", width).attr("height", 75).attr("id","scale")
+  g = g.append("g")
+      .attr("class", "key")
+      .attr("transform", "translate(0,40)");
+
+  x.domain([min, max])
+  quantile.domain(Object.keys(data).map(function(x) { return data[x]})).range(["#F5B3B3","#F68D8D", "#F54D4D ", "#CA1414"])
+
+  // Legend color scale
+  g.selectAll("rect")
+    .data(quantile.range().map(function(d) {
+        d = quantile.invertExtent(d);
+        if (d[0] == null) d[0] = x.domain()[0];
+        if (d[1] == null) d[1] = x.domain()[1];
+        return d;
+      }))
+    .enter().append("rect")
+      .attr("height", 8)
+      .attr("x", function(d) { return x(d[0]); })
+      .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+      .attr("fill", function(d) { return quantile(d[0]); });
+
+  // Legend title - "Unemployment rate"
+  g.append("text")
+      .attr("class", "caption")
+      .attr("x", x.range()[0])
+      .attr("y", -10)
+      .attr("fill", "#000")
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .text("Population");
+
+  // Legend markings - 2%, 3%, etc.
+  var t = [min]
+  for(i in quantile.quantiles()){
+    t.push(quantile.quantiles()[i])
+  }
+  t.push(max)
+
+  g.call(d3.axisBottom(x)
+      .tickSize(13)
+      .tickFormat(function(x, i) { return i ? x : x; })
+      .tickValues(t))
+    .select(".domain")
+      .remove();
+
+  tip.attr('class', 'd3-tip')
+  .offset(function () {
+    return[10,0];
+  })
+  .html(function(d) {
+    return convertFIP_N[parseInt(d.id)] + ": " + d.rate.toString();
+  })
+  svg.call(tip)
+
+  svg.append("g")
+      .attr("class", "counties")
     .selectAll("path")
+    // .data(topojson.feature(us, us.objects.counties).features)
     .data(topojson.feature(us, us.objects.states).features)
     .enter().append("path")
-    .attr("d", path)
-    //Color states
-    .attr("class", function(d) { return quantize(dataByFIPS[d.id]); })
-    //Hovers
+      .attr("fill", function(d) {
+        // console.log(d);
+        return quantile(d.rate = data[parseInt(d.id)]);
+      })
+      .attr("d", path)
     .on("mouseover", function(d) {
-      var sel = d3.select(this);
-        sel.moveToFront();
-      d3.select(this).transition().duration(300).style("opacity", 0.8);
-      div.transition().duration(300)
-      .style("opacity", 1)
-      div.text(stateByFIPS[d.id] + ": " + dataByFIPS[d.id])
-      .style("left", (d3.event.pageX) + "px")
-      .style("top", (d3.event.pageY -30) + "px");
-    })
-    .on("mouseout", function() {
-      var sel = d3.select(this);
-        sel.moveToBack();
-      d3.select(this)
-      .transition().duration(300)
-      .style("opacity", 1);
-      div.transition().duration(300)
-      .style("opacity", 0);
+      d3.select(this).transition().duration(300).style("opacity", 0.5);
+      tip.show(d)
+
+    }).on("mouseout", function() {
+      tip.hide()
+      d3.select(this).transition().duration(300).style("opacity", 1);
+    }).on("click", function(d) {
+
+      if(d.click){
+        d.click = false;
+        d3.select(this).attr("fill",quantile(d.rate = data[parseInt(d.id)]));
+      }
+      else{
+        d.click = true;
+        d3.select(this).attr("fill","yellow");
+      }
     });
 
-  //Appends chart source
-  d3.select(".g-source-bold")
-    .text("SOURCE: ")
-    .attr("class", "g-source-bold");
-
-  d3.select(".g-source-reg")
-    .text("Chart source info goes here")
-    .attr("class", "g-source-reg");
-
-    //RESPONSIVENESS
-d3.select(window).on('resize', resize);
-console.log(dataByFIPS)
-function resize() {
-
-    var w = d3.select(".g-chart").node().clientWidth;
-    console.log("resized", w);
-
-    // adjust things when the window size changes
-    width = w - margin.left - margin.right;
-    height = width * mapRatio;
-
-    console.log(width)
-    // update projection
-    var newProjection = d3.geo.albersUsa()
-      .scale(width)
-      .translate([width / 2, height / 2]);
-
-    //Update path
-    path = d3.geo.path()
-      .projection(newProjection);
-
-    // resize the map container
-    map
-        .style('width', width + 'px')
-        .style('height', height + 'px');
-
-    // resize the map
-    map.selectAll("path").attr('d', path);
-}
+  svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "states")
+      .attr("d", path);
 }
 
+function addLine(states){
 
-
-
+}
 </script>
