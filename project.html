@@ -27,7 +27,7 @@
   <label for="selectYear">Select Year:</label>
 	<select id="selectYear"></select>
   <div id="chloropleth"><svg width="960" height="600"></svg></div>
-  <div id="graph"><svg></svg></div>
+  <div id="graph"></div>
 <script>
 
 // Datasets
@@ -64,65 +64,138 @@ var convertN_FIP = {}
 var convertFIP_N = {}
 var convertFIP_C = {}
 var dropDownDate = d3.select("#selectYear")
+var dropDownData = d3.select("#selectData")
 var tip = d3.tip()
-var stateData = {}
+var stateDataPop = {}
+var stateDataTemp = {}
 var stateSelected = {}
+var popData = {}
+var tempData = {}
+var popMin = 0
+var popMax = 0
+var tempMin = 0
+var tempMax = 0
 
 Promise.all([
     // enter code to read files
     d3.json("https://d3js.org/us-10m.v1.json"),
-    d3.csv("StatePop1969_2019.csv"),
-    d3.tsv("us-state-names.tsv")
+    d3.csv("PopForecast.csv"),
+    d3.tsv("us-state-names.tsv"),
+    d3.csv("temp_proj.csv")
 ]).then((values) =>{
   // enter code to call ready() with required arguments
-  var data = {}
 
   for(i in values[2]){
     convertN_FIP[values[2][i]["code"]] = parseInt(values[2][i]["id"])
     convertFIP_N[parseInt(values[2][i]["id"])] = values[2][i]["name"]
     convertFIP_C[parseInt(values[2][i]["id"])] = values[2][i]["code"]
   }
+  convertN_FIP["Year"] = "Year"
   var keys = Object.keys(values[1][1])
   for(i in keys){
-    stateData[keys[i]] = []
-    stateSelected[keys[i]] = false
+    stateDataPop[convertN_FIP[keys[i]]] = []
+    stateSelected[convertN_FIP[keys[i]]] = false
   }
+
   for(i in values[1]){
-    for(j in keys){
-      stateData[keys[j]].push(parseInt(values[1][i][keys[j]]))
+    if(i != "columns"){
+      for(j in keys){
+        stateDataPop[convertN_FIP[keys[j]]].push(parseInt(values[1][i][keys[j]]))
+        if(keys[j] != "Year"){
+          if(parseInt(values[1][i][keys[j]]) > popMax){
+            popMax = parseInt(values[1][i][keys[j]])
+          }
+          if(parseInt(values[1][i][keys[j]]) < popMin){
+            popMin = parseInt(values[1][i][keys[j]])
+          }
+        }
+      }
+    }
+
+  }
+
+  keys = Object.keys(values[3][1])
+  for(i in keys){
+    stateDataTemp[convertN_FIP[keys[i]]] = []
+  }
+  for(i in values[3]){
+    if(i != "columns"){
+      for(j in keys){
+        stateDataTemp[convertN_FIP[keys[j]]].push(parseFloat(values[3][i][keys[j]]))
+        if(keys[j] != "Year"){
+          if(parseFloat(values[3][i][keys[j]]) > tempMax){
+            tempMax = parseFloat(values[3][i][keys[j]])
+          }
+          if(parseFloat(values[3][i][keys[j]]) < tempMin){
+            tempMin = parseFloat(values[3][i][keys[j]])
+          }
+        }
+      }
     }
   }
-  console.log(stateSelected)
+  console.log(popMax)
+  console.log(popMin)
   values[1].map(function(d){
     for(i in d){
       if(i == "Year"){
-        data[d["Year"]] = {}
+        popData[d["Year"]] = {}
       }
       else{
-        data[d["Year"]][convertN_FIP[i]] = parseInt(d[i])
+        popData[d["Year"]][convertN_FIP[i]] = parseInt(d[i])
+      }
+    }
+    return d;
+  })
+  values[3].map(function(d){
+    for(i in d){
+      if(i == "Year"){
+        tempData[d["Year"]] = {}
+      }
+      else{
+        tempData[d["Year"]][convertN_FIP[i]] = parseFloat(d[i]).toFixed(2)
       }
     }
     return d;
   })
 
-  ready("error", values[0], data, values[2])
+  ready("error", values[0], values[2])
 });
 
 
-function ready(error, us, data, usnames) {
-  var dates = Object.keys(data)
+function ready(error, us, usnames) {
+  var dates = Object.keys(popData)
   dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
-
+  dropDownData.append("option").text("Population").attr("value", "Population")
+  dropDownData.append("option").text("Temperature").attr("value", "Temperature")
   dropDownDate.on('change', function(){
-    createMapAndLegend(us, data[dropDownDate.property('value')], []);
+    if(dropDownData.property('value') == "Population"){
+      createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin);
+    }
+    else{
+      createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp, tempMax, tempMin);
+    }
   })
-
-  createMapAndLegend(us, data[dropDownDate.property('value')], [])
+  dropDownData.on('change', function(){
+    d3.select("#graph").select("svg").remove()
+    dropDownDate.selectAll("option").remove()
+    if(dropDownData.property('value') == "Population"){
+      var dates = Object.keys(popData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop)
+    }
+    else{
+      var dates = Object.keys(tempData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp)
+    }
+  })
+  createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin)
 
 
 }
 
-function createMapAndLegend(us, data, stateData){
+function createMapAndLegend(us, data, stateData, maxData, minData){
+  console.log(max)
   for(i in stateSelected){
     stateSelected[i] = false
   }
@@ -189,7 +262,7 @@ function createMapAndLegend(us, data, stateData){
   svg.call(tip)
 
   svg.append("g")
-      .attr("class", "counties")
+      .attr("class", "states")
     .selectAll("path")
     // .data(topojson.feature(us, us.objects.counties).features)
     .data(topojson.feature(us, us.objects.states).features)
@@ -211,10 +284,14 @@ function createMapAndLegend(us, data, stateData){
       if(d.click){
         d.click = false;
         d3.select(this).attr("fill",quantile(d.rate = data[parseInt(d.id)]));
+        stateSelected[parseInt(d.id)] = false
+        addLine(stateData, maxData, minData)
       }
       else{
         d.click = true;
         d3.select(this).attr("fill","yellow");
+        stateSelected[parseInt(d.id)] = true
+        addLine(stateData, maxData, minData)
       }
     });
 
@@ -224,7 +301,59 @@ function createMapAndLegend(us, data, stateData){
       .attr("d", path);
 }
 
-function addLine(states){
+function addLine(stateData, maxData, minData){
+  var t = false
+  var states = {}
+  for(i in stateSelected){
+    if(stateSelected[i]){
+      states[i] = convertFIP_N[i]
+      t = true
+    }
+  }
+  d3.select("#graph").select("svg").remove()
+  if(!t){
+    return
+  }
+  var mtop = 50
+  var mbottom = 350
+  var margin = 150;
+  var height = 750;
+  var width = 1000;
+  var colorScheme = d3.scaleOrdinal(colorArray[0]);
+
+  var parseTime = d3.timeParse("%Y");
+  var date = []
+  for(i=0; i<stateData["Year"].length; i++){
+    date.push(stateData["Year"][i])
+  }
+
+  var x = d3.scaleTime().range([margin,width-margin]);
+  var y = d3.scaleLinear().range([height-mbottom,mtop]);
+  var xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y"))
+  var yAxis = d3.axisLeft().scale(y)
+
+  var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
+  x.domain([parseTime(d3.min(date, function(d){return d})),parseTime(d3.max(date, function(d){return d}))]);
+
+  y.domain([minData, maxData]);
+  var c = 0
+  svg = svg.append("g")
+  for(i in states){
+    c ++
+    svg.append("path")
+        .datum(stateData[i])
+        .attr("fill", "none")
+        .attr("stroke", colorScheme(c))
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+          .x(function(d,i) {return x(parseTime(date[i])) })
+          .y(function(d) {return y(d) })
+          )
+    svg.append("circle").attr("cx",width-margin).attr("cy",margin + c*20).attr("r", 6).style("fill", colorScheme(c))
+    svg.append("text").attr("x", width-margin+20).attr("y", margin+2+ c*20).text(states[i]).style("font-size", "15px").attr("alignment-baseline","middle")
+  }
+  svg.append("g").attr("id", 'x_axis').attr("transform", "translate(0," + (height - mbottom) + ")").call(xAxis)
+  svg.append("g").attr("transform", "translate(" + margin + ",0)").attr("id", "y_axis").call(yAxis)
 
 }
 </script>
