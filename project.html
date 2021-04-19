@@ -34,11 +34,12 @@ padding: 10px;
 }
 
 .map-overlay .map-overlay-inner {
-background-color: #fff;
-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-border-radius: 3px;
 padding: 10px;
 margin-bottom: 10px;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
 }
 
 .map-overlay-inner fieldset {
@@ -72,13 +73,14 @@ margin-right: 10px;
 
 
 .map-overlay .map-overlay-inner2 {
-background-color: #fff;
-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-border-radius: 3px;
 padding: 10px;
 margin-bottom: 10px;
 position: fixed;
-bottom: 50;
+bottom: 20;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
 }
 
 .map-overlay-inner2 fieldset {
@@ -100,16 +102,19 @@ margin: 0;
 }
 
 .map-overlay .map-overlay-inner3 {
-background-color: #fff;
-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-border-radius: 3px;
+
 padding: 10px;
 margin-bottom: 10px;
 width: 110px;
 height: 280px;
 position: fixed;
-bottom: 50;
-right: 50;
+bottom: 20;
+right: 10;
+
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
 }
 
 .map-overlay-inner3 fieldset {
@@ -139,8 +144,8 @@ margin-bottom: 10px;
 width: 110px;
 height: 280px;
 position: fixed;
-bottom: 50;
-right: 50;
+bottom: 10;
+right: 10;
 }
 
 .map-overlay-inner4 fieldset {
@@ -159,6 +164,46 @@ width: 100%;
 
 .map-overlay-inner4 p {
 margin: 0;
+}
+
+
+
+
+.map-overlay .map-overlay-inner5 {
+margin-bottom: 10px;
+width: 240px;
+height: 110px;
+position: fixed;
+top: 10;
+right: 10;
+padding: 6px 8px;
+font: 14px/16px Arial, Helvetica, sans-serif;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
+}
+
+.map-overlay-inner5 fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner5 fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner5 select {
+width: 100%;
+}
+
+.map-overlay-inner5 p {
+  margin: 0 0 5px;
+}
+
+.map-overlay-inner4 h4 {
+margin: 0 0 5px; color: #777;
 }
 
 </style>
@@ -190,6 +235,12 @@ margin: 0;
 <div id = "ov3" class="map-overlay-inner3">
   <div id = "scale"></div>
 
+</div>
+
+<div id = "ov3" class="map-overlay-inner5">
+  <h4 id = "hov">US Population by State</h4>
+  <p id = "hovS"></p>
+  <p id = "hovN"></p>
 </div>
 
 </div>
@@ -229,6 +280,9 @@ margin: 0;
   var convertFIP_C = {}
   var dropDownDate = d3.select("#date")
   var dropDownData = d3.select("#data")
+  var hov = d3.select("#hov")
+  var hovS = d3.select("#hovS")
+  var hovN = d3.select("#hovN")
   var tip = d3.tip()
   var stateDataPop = {}
   var stateDataTemp = {}
@@ -248,6 +302,9 @@ margin: 0;
   var houseMin = 0
   var houseMax = 0
   var jselected = false
+  var xlable = "Year"
+  var ylable = "Population"
+  var title = "US States Population Over Time"
 
   Promise.all([
       // enter code to read files
@@ -465,6 +522,7 @@ margin: 0;
       d3.select("#graph").select("svg").remove()
       dropDownDate.selectAll("option").remove()
       if(dropDownData.property('value') == "Population"){
+        hov.text("US Population by State")
         jselected = false
         var dates = Object.keys(popData)
         dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
@@ -472,6 +530,7 @@ margin: 0;
         addLine(stateDataPop, popMax, popMin);
       }
       else if(dropDownData.property('value') == "Temperature"){
+        hov.text("US Temperature by State")
         jselected = false
         var dates = Object.keys(tempData)
         dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
@@ -479,6 +538,7 @@ margin: 0;
         addLine(stateDataTemp, tempMax, tempMin);
       }
       else if(dropDownData.property('value') == "Housing Price Index"){
+        hov.text("US Housing Price Index by State")
         jselected = true
         var dates = Object.keys(houseData)
         dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
@@ -486,6 +546,7 @@ margin: 0;
         addLine(stateDataHouse, houseMax, houseMin);
       }
       else{
+        hov.text("US Jobs Added by State")
         jselected = true
         var dates = Object.keys(jobsData)
         dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
@@ -650,6 +711,8 @@ function createMapAndLegend(us, data, stateData, maxData, minData){
       { hover: false }
       );
       }
+      hovS.text(convertFIP_N[e.features[0].id] + ":")
+      hovN.text(e.features[0].properties.value)
       hoveredStateId = e.features[0].id;
       map.setFeatureState(
       { source: 'states', id: hoveredStateId },
@@ -667,6 +730,8 @@ function createMapAndLegend(us, data, stateData, maxData, minData){
       { hover: false }
       );
       }
+      hovS.text("")
+      hovN.text("")
       hoveredStateId = null;
       });
 
@@ -689,74 +754,6 @@ function createMapAndLegend(us, data, stateData, maxData, minData){
         }
       });
 })
-
-
-
-  // svg.remove()
-  // svg = d3.select("#choropleth").append("svg").attr("width", width).attr("height", height)
-  // var min = Math.min.apply(null, Object.keys(data).map(function(x) { return data[x]}))
-  // var max = Math.max.apply(null, Object.keys(data).map(function(x) { return data[x]}))
-  //
-  // var cScale = d3.scaleSequential(d3.interpolateBlues)
-  //   .domain([min, max])
-  // continuous("#choropleth", cScale)
-  //
-  // tip.attr('class', 'd3-tip')
-  // .offset(function () {
-  //   return[10,0];
-  // })
-  // .html(function(d) {
-  //   return convertFIP_N[parseInt(d.id)] + ": " + d.rate.toString();
-  // })
-  // svg.call(tip)
-  //
-  // svg.append("g")
-  //     .attr("class", "states")
-  //   .selectAll("path")
-  //   // .data(topojson.feature(us, us.objects.counties).features)
-  //   .data(topojson.feature(us, us.objects.states).features)
-  //   .enter().append("path")
-  //     .attr("fill", function(d) {
-  //       // console.log(d);
-  //
-  //       if(stateSelected[parseInt(d.id)]){
-  //         d.rate = data[parseInt(d.id)]
-  //         d.click = true
-  //         return "yellow";
-  //       }
-  //       else{
-  //         return cScale(d.rate = data[parseInt(d.id)]);
-  //       }
-  //
-  //     })
-  //     .attr("d", path)
-  //   .on("mouseover", function(d) {
-  //     d3.select(this).transition().duration(300).style("opacity", 0.5);
-  //     tip.show(d)
-  //
-  //   }).on("mouseout", function() {
-  //     tip.hide()
-  //     d3.select(this).transition().duration(300).style("opacity", 1);
-  //   }).on("click", function(d) {
-  //
-  //     if(d.click){
-  //       d.click = false;
-  //       d3.select(this).attr("fill",cScale(d.rate = data[parseInt(d.id)]));
-  //       stateSelected[parseInt(d.id)] = false
-  //       addLine(stateData, maxData, minData)
-  //     }
-  //     else{
-  //       d.click = true;
-  //       d3.select(this).attr("fill","yellow");
-  //       stateSelected[parseInt(d.id)] = true
-  //       addLine(stateData, maxData, minData)
-  //     }
-  //   });
-  //
-  // svg.append("path")
-  //     .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-  //     .attr("class", "states")
-  //     .attr("d", path);
 }
 
 function addLine(stateData, maxData, minData){
@@ -775,9 +772,10 @@ function addLine(stateData, maxData, minData){
   }
   var mtop = 50
   var mbottom = 50
-  var margin = 150;
-  var height = 450;
-  var width = 800;
+  var margin = 120;
+  var mright = 20;
+  var height = 400;
+  var width = 700;
   if(jselected){
     var parseTime = d3.timeParse("%Y %B");
   }
@@ -790,7 +788,7 @@ function addLine(stateData, maxData, minData){
     date.push(stateData["Year"][i])
   }
 
-  var x = d3.scaleTime().range([margin,width-margin]);
+  var x = d3.scaleTime().range([margin,width-margin-mright]);
   var y = d3.scaleLinear().range([height-mbottom,mtop]);
   var xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y"))
   if(jselected){
@@ -816,8 +814,8 @@ function addLine(stateData, maxData, minData){
           .x(function(d,i) {return x(parseTime(date[i])) })
           .y(function(d) {return y(d) })
         )
-    svg.append("circle").attr("cx",width-margin+20).attr("cy",margin-120 + c*20).attr("r", 6).style("fill", colorScheme(i))
-    svg.append("text").attr("x", width-margin+40).attr("y", margin-120+2+ c*20).text(states[i]).style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("circle").attr("cx",width-margin-mright+20).attr("cy",margin-120 + c*20).attr("r", 6).style("fill", colorScheme(i))
+    svg.append("text").attr("x", width-margin-mright+40).attr("y", margin-120+2+ c*20).text(states[i]).style("font-size", "15px").attr("alignment-baseline","middle")
   }
   svg.append("g").attr("id", 'x_axis').attr("transform", "translate(0," + (height - mbottom) + ")").call(xAxis)
   svg.append("g").attr("transform", "translate(" + margin + ",0)").attr("id", "y_axis").call(yAxis)
