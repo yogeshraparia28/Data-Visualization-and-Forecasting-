@@ -1,0 +1,1331 @@
+<html>
+<head>
+<meta charset="utf-8">
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.js"></script>
+<script src="d3-tip.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<script type="text/javascript" src="us-states.js"></script>
+
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+.map-overlay {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+position: absolute;
+width: 295px;
+top: 0;
+left: 0;
+padding: 10px;
+}
+
+.map-overlay .map-overlay-inner {
+padding: 10px;
+margin-bottom: 10px;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
+}
+
+.map-overlay-inner fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner select {
+width: 100%;
+}
+
+.map-overlay-inner p {
+margin: 0;
+}
+
+.map-overlay2 {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+position: absolute;
+width: 295px;
+top: 0;
+left: 0;
+padding: 10px;
+float: right;
+margin-right: 10px;
+}
+
+
+.map-overlay .map-overlay-inner2 {
+padding: 10px;
+margin-bottom: 10px;
+position: fixed;
+bottom: 20;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
+}
+
+.map-overlay-inner2 fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner2 fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner2 select {
+width: 100%;
+}
+
+.map-overlay-inner2 p {
+margin: 0;
+}
+
+.map-overlay .map-overlay-inner3 {
+
+padding: 10px;
+margin-bottom: 10px;
+width: 110px;
+height: 280px;
+position: fixed;
+bottom: 20;
+right: 10;
+
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
+}
+
+.map-overlay-inner3 fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner3 fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner3 select {
+width: 100%;
+}
+
+.map-overlay-inner3 p {
+margin: 0;
+}
+
+.map-overlay .map-overlay-inner4 {
+background-color: #fff;
+box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+border-radius: 3px;
+padding: 10px;
+margin-bottom: 10px;
+width: 110px;
+height: 280px;
+position: fixed;
+bottom: 10;
+right: 10;
+}
+
+.map-overlay-inner4 fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner4 fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner4 select {
+width: 100%;
+}
+
+.map-overlay-inner4 p {
+margin: 0;
+}
+
+
+
+
+.map-overlay .map-overlay-inner5 {
+margin-bottom: 10px;
+width: 240px;
+height: 110px;
+position: fixed;
+top: 10;
+right: 10;
+padding: 6px 8px;
+font: 14px/16px Arial, Helvetica, sans-serif;
+background: white;
+background: rgba(255,255,255,0.8);
+box-shadow: 0 0 15px rgba(0,0,0,0.2);
+border-radius: 5px;
+}
+
+.map-overlay-inner5 fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner5 fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner5 select {
+width: 100%;
+}
+
+.map-overlay-inner5 p {
+  margin: 0 0 5px;
+}
+
+.map-overlay-inner4 h4 {
+margin: 0 0 5px; color: #777;
+}
+
+</style>
+
+<style>
+.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+.info h4 { margin: 0 0 5px; color: #777; }
+.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+
+</style>
+
+<div id="map"></div>
+<div class="map-overlay top">
+<div id = "ov1" class="map-overlay-inner">
+<fieldset>
+<label>Select Data Set</label>
+<select id="data" name="data">
+</select>
+<label>Select Time Period</label>
+<select id="date" name="date">
+</select>
+</div>
+
+
+<div id = "ov2" class="map-overlay-inner2">
+<div id="graph"></div>
+</div>
+
+<div id = "ov3" class="map-overlay-inner3">
+  <div id = "scale"></div>
+
+</div>
+
+<div id = "ov3" class="map-overlay-inner5">
+  <h4 id = "hov">US Population by State</h4>
+  <p id = "hovS"></p>
+  <p id = "hovN"></p>
+</div>
+
+</div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoia3lsZWxpbmR0ZWlnZW4iLCJhIjoiY2tuaDlmNmlpMGh4MDJ3bnd0MG92MGVjYyJ9.8sDSJD96SxMEFdziO8wGJg';
+
+
+  var colorArray = [d3.schemeCategory10, d3.schemeAccent];
+
+  var colorScheme = d3.scaleOrdinal(colorArray[0]);
+
+  // var svg = d3.select("#choropleth").select("svg"),
+  //     width = +svg.attr("width"),
+  //     height = +svg.attr("height");
+
+  // var path = d3.geoPath();
+
+  // var unemployment = d3.map();
+  //
+  // var xgraph = d3.scaleLinear()
+  //     .range([0, width]);
+  //
+  // var x = d3.scaleLinear()
+  //     .rangeRound([10, 870]);
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-100.486052, 37.830348],
+    zoom: 2
+    });
+
+  var quantile = d3.scaleQuantile();
+
+  var convertN_FIP = {}
+  var convertFIP_N = {}
+  var convertFIP_C = {}
+  var dropDownDate = d3.select("#date")
+  var dropDownData = d3.select("#data")
+  var hov = d3.select("#hov")
+  var hovS = d3.select("#hovS")
+  var hovN = d3.select("#hovN")
+  var tip = d3.tip()
+  var stateDataPop = {}
+  var stateDataTemp = {}
+  var stateDataJobs = {}
+  var stateDataHouse = {}
+  var stateSelected = {}
+  var popData = {}
+  var tempData = {}
+  var jobsData = {}
+  var houseData = {}
+  var popMin = 0
+  var popMax = 0
+  var tempMin = 0
+  var tempMax = 0
+  var jobsMin = 0
+  var jobsMax = 0
+  var houseMin = 0
+  var houseMax = 0
+  var jselected = false
+  var xlable = "Year"
+  var ylable = "Population"
+  var title = "US States Population Over Time"
+
+  Promise.all([
+      // enter code to read files
+      d3.json("https://d3js.org/us-10m.v1.json"),
+      d3.csv("PopForecast.csv"),
+      d3.tsv("us-state-names.tsv"),
+      d3.csv("temp_proj.csv"),
+      d3.csv("jobForecast.csv"),
+      d3.csv("HousingData.csv")
+  ]).then((values) =>{
+    // enter code to call ready() with required arguments
+
+    for(i in values[2]){
+      convertN_FIP[values[2][i]["code"]] = parseInt(values[2][i]["id"])
+      convertFIP_N[parseInt(values[2][i]["id"])] = values[2][i]["name"]
+      convertFIP_C[parseInt(values[2][i]["id"])] = values[2][i]["code"]
+    }
+    convertN_FIP["Year"] = "Year"
+    var keys = Object.keys(values[1][1])
+    for(i in keys){
+      stateDataPop[convertN_FIP[keys[i]]] = []
+      stateSelected[convertN_FIP[keys[i]]] = false
+    }
+
+    for(i in values[1]){
+      if(i != "columns"){
+        for(j in keys){
+          stateDataPop[convertN_FIP[keys[j]]].push(parseInt(values[1][i][keys[j]]))
+          if(keys[j] != "Year"){
+            if(parseInt(values[1][i][keys[j]]) > popMax){
+              popMax = parseInt(values[1][i][keys[j]])
+            }
+            if(parseInt(values[1][i][keys[j]]) < popMin){
+              popMin = parseInt(values[1][i][keys[j]])
+            }
+          }
+        }
+      }
+    }
+
+    keys = Object.keys(values[3][1])
+    for(i in keys){
+      stateDataTemp[convertN_FIP[keys[i]]] = []
+    }
+    for(i in values[3]){
+      if(i != "columns"){
+        for(j in keys){
+          stateDataTemp[convertN_FIP[keys[j]]].push(parseFloat(values[3][i][keys[j]]))
+          if(keys[j] != "Year"){
+            if(parseFloat(values[3][i][keys[j]]) > tempMax){
+              tempMax = parseFloat(values[3][i][keys[j]])
+            }
+            if(parseFloat(values[3][i][keys[j]]) < tempMin){
+              tempMin = parseFloat(values[3][i][keys[j]])
+            }
+          }
+        }
+      }
+    }
+
+    keys = Object.keys(values[4][1])
+
+    for(i in keys){
+      if(convertN_FIP[keys[i]] != undefined){
+        stateDataJobs[convertN_FIP[keys[i]]] = []
+        stateDataHouse[convertN_FIP[keys[i]]] = []
+      }
+      else{
+        stateDataJobs["Year"] = []
+        stateDataHouse["Year"] = []
+      }
+    }
+    for(i in values[4]){
+      if(i != "columns"){
+        for(j in keys){
+          if(convertN_FIP[keys[j]] != undefined){
+            stateDataJobs[convertN_FIP[keys[j]]].push(parseFloat(values[4][i][keys[j]]))
+          }
+          else{
+            stateDataJobs["Year"].push(values[4][i]["Quarter"])
+          }
+          if(keys[j] != "Quarter"){
+            if(parseFloat(values[4][i][keys[j]]) > jobsMax){
+              jobsMax = parseFloat(values[4][i][keys[j]])
+            }
+            if(parseFloat(values[4][i][keys[j]]) < jobsMin){
+              jobsMin = parseFloat(values[4][i][keys[j]])
+            }
+          }
+        }
+      }
+    }
+
+    var c = 0
+    for(i in values[5]){
+      c++
+      if(stateDataHouse[convertN_FIP[values[5][i]["State"]]] != undefined){
+        stateDataHouse[convertN_FIP[values[5][i]["State"]]].push(values[5][i]["HPI"])
+        if(houseMax< values[5][i]["HPI"]){
+          houseMax = values[5][i]["HPI"]
+        }
+        if(c <= 204){
+          if(values[5][i]["Quarter"] == "1"){
+            stateDataHouse["Year"].push(values[5][i]["Year"] + " January")
+            houseData[values[5][i]["Year"] + " January"] = {}
+            houseData[values[5][i]["Year"] + " January"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "2"){
+            stateDataHouse["Year"].push(values[5][i]["Year"] + " April")
+            houseData[values[5][i]["Year"] + " April"] = {}
+            houseData[values[5][i]["Year"] + " April"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "3"){
+            stateDataHouse["Year"].push(values[5][i]["Year"] + " July")
+            houseData[values[5][i]["Year"] + " July"] = {}
+            houseData[values[5][i]["Year"] + " July"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "4"){
+            stateDataHouse["Year"].push(values[5][i]["Year"] + " October")
+            houseData[values[5][i]["Year"] + " October"] = {}
+            houseData[values[5][i]["Year"] + " October"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+        }
+        else{
+          if(values[5][i]["Quarter"] == "1"){
+            houseData[values[5][i]["Year"] + " January"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "2"){
+            houseData[values[5][i]["Year"] + " April"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "3"){
+            houseData[values[5][i]["Year"] + " July"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+          else if(values[5][i]["Quarter"] == "4"){
+            houseData[values[5][i]["Year"] + " October"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+          }
+        }
+      }
+    }
+
+
+
+    values[1].map(function(d){
+      for(i in d){
+        if(i == "Year"){
+          popData[d["Year"]] = {}
+        }
+        else{
+          popData[d["Year"]][convertN_FIP[i]] = parseInt(d[i])
+        }
+      }
+      return d;
+    })
+
+    values[3].map(function(d){
+      for(i in d){
+        if(i == "Year"){
+          tempData[d["Year"]] = {}
+        }
+        else{
+          tempData[d["Year"]][convertN_FIP[i]] = parseFloat(d[i]).toFixed(2)
+        }
+      }
+      return d;
+    })
+    values[4].map(function(d){
+      for(i in d){
+        if(i == "Quarter"){
+          jobsData[d["Quarter"]] = {}
+        }
+        else{
+          jobsData[d["Quarter"]][convertN_FIP[i]] = parseFloat(d[i]).toFixed(2)
+        }
+      }
+      return d;
+    })
+
+
+    ready("error", values[0], values[2])
+  });
+
+
+  function ready(error, us, usnames) {
+    var dates = Object.keys(popData)
+    dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+    dropDownData.append("option").text("Population").attr("value", "Population")
+    dropDownData.append("option").text("Temperature").attr("value", "Temperature")
+    dropDownData.append("option").text("Jobs Added in State in Next Four Quarters").attr("value", "Jobs Added in State in Next Four Quarters")
+    dropDownData.append("option").text("Housing Price Index").attr("value", "Housing Price Index")
+    dropDownDate.on('change', function(){
+      for(i in stateSelected){
+        stateSelected[i] = false
+      }
+      if(dropDownData.property('value') == "Population"){
+        addLine(stateDataPop, popMax, popMin);
+        createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin);
+      }
+      else if(dropDownData.property('value') == "Temperature"){
+        addLine(stateDataTemp, tempMax, tempMin);
+        createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp, tempMax, tempMin);
+      }
+      else if(dropDownData.property('value') == "Housing Price Index"){
+        addLine(stateDataHouse, houseMax, houseMin);
+        createMapAndLegend(us, houseData[dropDownDate.property('value')], stateDataHouse, houseMax, houseMin);
+      }
+      else{
+        addLine(stateDataJobs, jobsMax, jobsMin);
+        createMapAndLegend(us, jobsData[dropDownDate.property('value')], stateDataJobs, jobsMax, jobsMin);
+      }
+    })
+    dropDownData.on('change', function(){
+      for(i in stateSelected){
+        stateSelected[i] = false
+      }
+      d3.select("#graph").select("svg").remove()
+      dropDownDate.selectAll("option").remove()
+      if(dropDownData.property('value') == "Population"){
+        hov.text("US Population by State")
+        jselected = false
+        var dates = Object.keys(popData)
+        dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+        createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin)
+        addLine(stateDataPop, popMax, popMin);
+      }
+      else if(dropDownData.property('value') == "Temperature"){
+        hov.text("US Temperature by State")
+        jselected = false
+        var dates = Object.keys(tempData)
+        dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+        createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp, tempMax, tempMin)
+        addLine(stateDataTemp, tempMax, tempMin);
+      }
+      else if(dropDownData.property('value') == "Housing Price Index"){
+        hov.text("US Housing Price Index by State")
+        jselected = true
+        var dates = Object.keys(houseData)
+        dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+        createMapAndLegend(us, houseData[dropDownDate.property('value')], stateDataHouse, houseMax, houseMin)
+        addLine(stateDataHouse, houseMax, houseMin);
+      }
+      else{
+        hov.text("US Jobs Added by State")
+        jselected = true
+        var dates = Object.keys(jobsData)
+        dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+        createMapAndLegend(us, jobsData[dropDownDate.property('value')], stateDataJobs, jobsMax, jobsMin)
+        addLine(stateDataJobs, jobsMax, jobsMin);
+      }
+    })
+    createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin)
+}
+
+
+function continuous(selector_id, colorscale) {
+
+  var legendheight = 300,
+      legendwidth = 150,
+      margin = {top: 30, right: 120, bottom: 10, left: 10};
+
+  d3.select(selector_id).select("#c").remove()
+  d3.select(selector_id).select("#s").remove()
+  var canvas = d3.select(selector_id)
+    .append("canvas")
+    .attr("height", legendheight - margin.top - margin.bottom)
+    .attr("width", 1)
+    .style("height", (legendheight - margin.top - margin.bottom) + "px")
+    .style("width", (legendwidth - margin.left - margin.right) + "px")
+    .style("border", "1px solid #000")
+    .style("position", "absolute")
+    .style("top", (margin.top) + "px")
+    .style("left", (margin.left) + "px").attr("id", "c");
+
+  var ctx = canvas.node().getContext("2d");
+
+  var legendscale = d3.scaleLinear()
+    .range([1, legendheight - margin.top - margin.bottom])
+    .domain(colorscale.domain());
+
+  // image data hackery based on http://bl.ocks.org/mbostock/048d21cf747371b11884f75ad896e5a5
+  var image = ctx.createImageData(1, legendheight);
+  d3.range(legendheight).forEach(function(i) {
+    var c = d3.rgb(colorscale(legendscale.invert(i)));
+    image.data[4*i] = c.r;
+    image.data[4*i + 1] = c.g;
+    image.data[4*i + 2] = c.b;
+    image.data[4*i + 3] = 255;
+  });
+  ctx.putImageData(image, 0, 0);
+
+  // A simpler way to do the above, but possibly slower. keep in mind the legend width is stretched because the width attr of the canvas is 1
+  // See http://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
+  /*
+  d3.range(legendheight).forEach(function(i) {
+    ctx.fillStyle = colorscale(legendscale.invert(i));
+    ctx.fillRect(0,i,1,1);
+  });
+  */
+
+  var legendaxis = d3.axisRight()
+    .scale(legendscale)
+    .tickSize(6)
+    .ticks(7);
+
+  var svg = d3.select(selector_id)
+    .append("svg")
+    .attr("height", (legendheight) + "px")
+    .attr("width", (legendwidth) + "px")
+    .attr("id", "s")
+    .style("position", "absolute")
+    .style("left", "0px")
+    .style("top", "0px")
+
+  svg.attr("transform", "translate("+(margin.left-3)+",0)")
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")").style("font-size","16px")
+    .call(legendaxis);
+};
+
+function createMapAndLegend(us, data, stateData, maxData, minData){
+  console.log(stateSelected)
+
+  map.remove()
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-100.486052, 37.830348],
+    zoom: 3
+    });
+    //
+
+    var min = Math.min.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+    var max = Math.max.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+
+    var cScale = d3.scaleSequential(d3.interpolateBlues)
+      .domain([min, max])
+    continuous("#scale", cScale)
+
+    var d = {}
+    for(i in data){
+      for(j in statesData["features"]){
+        if(i == parseInt(statesData["features"][j]["id"])){
+          statesData["features"][j]["properties"]["value"] = data[i]
+          statesData["features"][j]["properties"]["id"] = statesData["features"][j]["id"]
+          d[statesData["features"][j]["id"]] = data[i]
+        }
+      }
+    }
+    var hoveredStateId = null
+    map.on('load', function(){
+      map.addSource("states", {'type':'geojson', 'data': {'type': 'FeatureCollection', "features": statesData["features"]}})
+
+      var matchExpression = ['match', ['get', 'id']];
+
+      for(i in d){
+        matchExpression.push(i, cScale(d[i]))
+      }
+      matchExpression.push('#ccc');
+      console.log(matchExpression)
+      map.addLayer({
+          'id': "states-join",
+          'type': 'fill',
+          'source': "states", // reference the data source
+          'layout': {},
+          'paint': {
+          'fill-color': matchExpression, // blue color fill
+        }
+      });
+      map.addLayer({
+        'id': 'outline-states',
+        'type': 'line',
+        'source': "states",
+        'layout': {},
+        'paint': {
+        'line-color': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        '#000',
+        [
+        'case',
+        ['boolean', ['feature-state', 'click'], false],
+        '#000',
+        '#d3d3d3'
+        ]
+        ],
+        'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        3,
+        [
+        'case',
+        ['boolean', ['feature-state', 'click'], false],
+        3,
+        1
+        ]
+        ]
+      }
+      });
+      map.on('mousemove', 'states-join', function (e) {
+      if (e.features.length > 0) {
+      if (hoveredStateId !== null) {
+      map.setFeatureState(
+      { source: 'states', id: hoveredStateId },
+      { hover: false }
+      );
+      }
+      hovS.text(convertFIP_N[e.features[0].id] + ":")
+      hovN.text(e.features[0].properties.value)
+      hoveredStateId = e.features[0].id;
+      map.setFeatureState(
+      { source: 'states', id: hoveredStateId },
+      { hover: true }
+      );
+      }
+      });
+
+      // When the mouse leaves the state-fill layer, update the feature state of the
+      // previously hovered feature.
+      map.on('mouseleave', 'states-join', function () {
+      if (hoveredStateId !== null) {
+      map.setFeatureState(
+      { source: 'states', id: hoveredStateId },
+      { hover: false }
+      );
+      }
+      hovS.text("")
+      hovN.text("")
+      hoveredStateId = null;
+      });
+
+      map.on('click', 'states-join', function (e) {
+        if(e.features[0]["state"]["click"]){
+          map.setFeatureState(
+          { source: 'states', id: e.features[0].id },
+          { click: false }
+          );
+          stateSelected[parseInt(e.features[0].id)] = false
+          addLine(stateData, maxData, minData)
+        }
+        else{
+          map.setFeatureState(
+          { source: 'states', id: e.features[0].id },
+          { click: true }
+          );
+          stateSelected[parseInt(e.features[0].id)] = true
+          addLine(stateData, maxData, minData)
+        }
+      });
+})
+}
+
+function addLine(stateData, maxData, minData){
+  var t = false
+  var states = {}
+  for(i in stateSelected){
+    if(stateSelected[i]){
+      states[i] = convertFIP_N[i]
+      t = true
+    }
+  }
+  d3.select("#graph").select("svg").remove()
+
+  if(!t){
+    return
+  }
+  var mtop = 50
+  var mbottom = 50
+  var margin = 120;
+  var mright = 20;
+  var height = 400;
+  var width = 700;
+  if(jselected){
+    var parseTime = d3.timeParse("%Y %B");
+  }
+  else{
+    var parseTime = d3.timeParse("%Y");
+  }
+
+  var date = []
+  for(i=0; i<stateData["Year"].length; i++){
+    date.push(stateData["Year"][i])
+  }
+
+  var x = d3.scaleTime().range([margin,width-margin-mright]);
+  var y = d3.scaleLinear().range([height-mbottom,mtop]);
+  var xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y"))
+  if(jselected){
+    xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y %b"))
+  }
+  var yAxis = d3.axisLeft().scale(y)
+
+  var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
+  x.domain([parseTime(date[0]),parseTime(date[date.length-1])]);
+
+
+  y.domain([minData, maxData]);
+  var c = 0
+  svg = svg.append("g")
+  for(i in states){
+    c ++
+    svg.append("path")
+        .datum(stateData[i])
+        .attr("fill", "none")
+        .attr("stroke", colorScheme(i))
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+          .x(function(d,i) {return x(parseTime(date[i])) })
+          .y(function(d) {return y(d) })
+        )
+    svg.append("circle").attr("cx",width-margin-mright+20).attr("cy",margin-120 + c*20).attr("r", 6).style("fill", colorScheme(i))
+    svg.append("text").attr("x", width-margin-mright+40).attr("y", margin-120+2+ c*20).text(states[i]).style("font-size", "15px").attr("alignment-baseline","middle")
+  }
+  svg.append("g").attr("id", 'x_axis').attr("transform", "translate(0," + (height - mbottom) + ")").call(xAxis)
+  svg.append("g").attr("transform", "translate(" + margin + ",0)").attr("id", "y_axis").call(yAxis)
+
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<style>
+.counties {
+  fill: none;
+}
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+.d3-tip {
+  line-height: 1;
+  padding: 12px;
+  background: rgba(43,43,43, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.js"></script>
+<script src="d3-tip.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+<body>
+  <label for="selectData">Select Data Set:</label>
+	<select id="selectData"></select>
+  <label for="selectYear">Select Year:</label>
+	<select id="selectYear"></select>
+  <div id="choropleth" height = "600"><svg width="960" height="600"></svg></div>
+  <div id = "scale"></div>
+  <div id="graph"></div>
+<script>
+  mapboxgl.AccessToken = "pk.eyJ1Ijoia3lsZWxpbmR0ZWlnZW4iLCJhIjoiY2tuaDlnenY3MjVmeTJ2b29nc2VhcmJ0NiJ9.elxwdtPeRblK51HOy4LGCQ";
+  var map = new mapboxgl.Map({
+    container: 'map', // container ID
+    style: 'mapbox://styles/mapbox/light-v10', // style URL
+    center: [-68.137343, 45.137451], // starting position
+    zoom: 5 // starting zoom
+  });
+// Datasets
+// FIP codes
+// https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt
+// https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code
+//
+// Unemployment rates
+// https://www.bls.gov/lau/#tables
+// https://bl.ocks.org/mbostock/4060606
+var colorArray = [d3.schemeCategory10, d3.schemeAccent];
+var colorScheme = d3.scaleOrdinal(colorArray[0]);
+var svg = d3.select("#choropleth").select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+var path = d3.geoPath();
+var unemployment = d3.map();
+var xgraph = d3.scaleLinear()
+    .range([0, width]);
+var x = d3.scaleLinear()
+    .rangeRound([10, 870]);
+var quantile = d3.scaleQuantile();
+var convertN_FIP = {}
+var convertFIP_N = {}
+var convertFIP_C = {}
+var dropDownDate = d3.select("#selectYear")
+var dropDownData = d3.select("#selectData")
+var tip = d3.tip()
+var stateDataPop = {}
+var stateDataTemp = {}
+var stateDataJobs = {}
+var stateDataHouse = {}
+var stateSelected = {}
+var popData = {}
+var tempData = {}
+var jobsData = {}
+var houseData = {}
+var popMin = 0
+var popMax = 0
+var tempMin = 0
+var tempMax = 0
+var jobsMin = 0
+var jobsMax = 0
+var houseMin = 0
+var houseMax = 0
+var jselected = false
+Promise.all([
+    // enter code to read files
+    d3.json("https://d3js.org/us-10m.v1.json"),
+    d3.csv("PopForecast.csv"),
+    d3.tsv("us-state-names.tsv"),
+    d3.csv("temp_proj.csv"),
+    d3.csv("jobForecast.csv"),
+    d3.csv("HousingData.csv")
+]).then((values) =>{
+  // enter code to call ready() with required arguments
+  for(i in values[2]){
+    convertN_FIP[values[2][i]["code"]] = parseInt(values[2][i]["id"])
+    convertFIP_N[parseInt(values[2][i]["id"])] = values[2][i]["name"]
+    convertFIP_C[parseInt(values[2][i]["id"])] = values[2][i]["code"]
+  }
+  convertN_FIP["Year"] = "Year"
+  var keys = Object.keys(values[1][1])
+  for(i in keys){
+    stateDataPop[convertN_FIP[keys[i]]] = []
+    stateSelected[convertN_FIP[keys[i]]] = false
+  }
+  for(i in values[1]){
+    if(i != "columns"){
+      for(j in keys){
+        stateDataPop[convertN_FIP[keys[j]]].push(parseInt(values[1][i][keys[j]]))
+        if(keys[j] != "Year"){
+          if(parseInt(values[1][i][keys[j]]) > popMax){
+            popMax = parseInt(values[1][i][keys[j]])
+          }
+          if(parseInt(values[1][i][keys[j]]) < popMin){
+            popMin = parseInt(values[1][i][keys[j]])
+          }
+        }
+      }
+    }
+  }
+  keys = Object.keys(values[3][1])
+  for(i in keys){
+    stateDataTemp[convertN_FIP[keys[i]]] = []
+  }
+  for(i in values[3]){
+    if(i != "columns"){
+      for(j in keys){
+        stateDataTemp[convertN_FIP[keys[j]]].push(parseFloat(values[3][i][keys[j]]))
+        if(keys[j] != "Year"){
+          if(parseFloat(values[3][i][keys[j]]) > tempMax){
+            tempMax = parseFloat(values[3][i][keys[j]])
+          }
+          if(parseFloat(values[3][i][keys[j]]) < tempMin){
+            tempMin = parseFloat(values[3][i][keys[j]])
+          }
+        }
+      }
+    }
+  }
+  keys = Object.keys(values[4][1])
+  for(i in keys){
+    if(convertN_FIP[keys[i]] != undefined){
+      stateDataJobs[convertN_FIP[keys[i]]] = []
+      stateDataHouse[convertN_FIP[keys[i]]] = []
+    }
+    else{
+      stateDataJobs["Year"] = []
+      stateDataHouse["Year"] = []
+    }
+  }
+  for(i in values[4]){
+    if(i != "columns"){
+      for(j in keys){
+        if(convertN_FIP[keys[j]] != undefined){
+          stateDataJobs[convertN_FIP[keys[j]]].push(parseFloat(values[4][i][keys[j]]))
+        }
+        else{
+          stateDataJobs["Year"].push(values[4][i]["Quarter"])
+        }
+        if(keys[j] != "Quarter"){
+          if(parseFloat(values[4][i][keys[j]]) > jobsMax){
+            jobsMax = parseFloat(values[4][i][keys[j]])
+          }
+          if(parseFloat(values[4][i][keys[j]]) < jobsMin){
+            jobsMin = parseFloat(values[4][i][keys[j]])
+          }
+        }
+      }
+    }
+  }
+  var c = 0
+  for(i in values[5]){
+    c++
+    if(stateDataHouse[convertN_FIP[values[5][i]["State"]]] != undefined){
+      stateDataHouse[convertN_FIP[values[5][i]["State"]]].push(values[5][i]["HPI"])
+      if(houseMax< values[5][i]["HPI"]){
+        houseMax = values[5][i]["HPI"]
+      }
+      if(c <= 204){
+        if(values[5][i]["Quarter"] == "1"){
+          stateDataHouse["Year"].push(values[5][i]["Year"] + " January")
+          houseData[values[5][i]["Year"] + " January"] = {}
+          houseData[values[5][i]["Year"] + " January"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "2"){
+          stateDataHouse["Year"].push(values[5][i]["Year"] + " April")
+          houseData[values[5][i]["Year"] + " April"] = {}
+          houseData[values[5][i]["Year"] + " April"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "3"){
+          stateDataHouse["Year"].push(values[5][i]["Year"] + " July")
+          houseData[values[5][i]["Year"] + " July"] = {}
+          houseData[values[5][i]["Year"] + " July"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "4"){
+          stateDataHouse["Year"].push(values[5][i]["Year"] + " October")
+          houseData[values[5][i]["Year"] + " October"] = {}
+          houseData[values[5][i]["Year"] + " October"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+      }
+      else{
+        if(values[5][i]["Quarter"] == "1"){
+          houseData[values[5][i]["Year"] + " January"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "2"){
+          houseData[values[5][i]["Year"] + " April"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "3"){
+          houseData[values[5][i]["Year"] + " July"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+        else if(values[5][i]["Quarter"] == "4"){
+          houseData[values[5][i]["Year"] + " October"][convertN_FIP[values[5][i]["State"]]] = values[5][i]["HPI"]
+        }
+      }
+    }
+  }
+  values[1].map(function(d){
+    for(i in d){
+      if(i == "Year"){
+        popData[d["Year"]] = {}
+      }
+      else{
+        popData[d["Year"]][convertN_FIP[i]] = parseInt(d[i])
+      }
+    }
+    return d;
+  })
+  values[3].map(function(d){
+    for(i in d){
+      if(i == "Year"){
+        tempData[d["Year"]] = {}
+      }
+      else{
+        tempData[d["Year"]][convertN_FIP[i]] = parseFloat(d[i]).toFixed(2)
+      }
+    }
+    return d;
+  })
+  values[4].map(function(d){
+    for(i in d){
+      if(i == "Quarter"){
+        jobsData[d["Quarter"]] = {}
+      }
+      else{
+        jobsData[d["Quarter"]][convertN_FIP[i]] = parseFloat(d[i]).toFixed(2)
+      }
+    }
+    return d;
+  })
+  ready("error", values[0], values[2])
+});
+function ready(error, us, usnames) {
+  var dates = Object.keys(popData)
+  dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+  dropDownData.append("option").text("Population").attr("value", "Population")
+  dropDownData.append("option").text("Temperature").attr("value", "Temperature")
+  dropDownData.append("option").text("Jobs Added in State in Next Four Quarters").attr("value", "Jobs Added in State in Next Four Quarters")
+  dropDownData.append("option").text("Housing Price Index").attr("value", "Housing Price Index")
+  dropDownDate.on('change', function(){
+    if(dropDownData.property('value') == "Population"){
+      addLine(stateDataPop, popMax, popMin);
+      createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin);
+    }
+    else if(dropDownData.property('value') == "Temperature"){
+      addLine(stateDataTemp, tempMax, tempMin);
+      createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp, tempMax, tempMin);
+    }
+    else if(dropDownData.property('value') == "Housing Price Index"){
+      addLine(stateDataHouse, houseMax, houseMin);
+      createMapAndLegend(us, houseData[dropDownDate.property('value')], stateDataHouse, houseMax, houseMin);
+    }
+    else{
+      addLine(stateDataJobs, jobsMax, jobsMin);
+      createMapAndLegend(us, jobsData[dropDownDate.property('value')], stateDataJobs, jobsMax, jobsMin);
+    }
+  })
+  dropDownData.on('change', function(){
+    d3.select("#graph").select("svg").remove()
+    dropDownDate.selectAll("option").remove()
+    if(dropDownData.property('value') == "Population"){
+      jselected = false
+      var dates = Object.keys(popData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin)
+      addLine(stateDataPop, popMax, popMin);
+    }
+    else if(dropDownData.property('value') == "Temperature"){
+      jselected = false
+      var dates = Object.keys(tempData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, tempData[dropDownDate.property('value')], stateDataTemp, tempMax, tempMin)
+      addLine(stateDataTemp, tempMax, tempMin);
+    }
+    else if(dropDownData.property('value') == "Housing Price Index"){
+      jselected = true
+      var dates = Object.keys(houseData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, houseData[dropDownDate.property('value')], stateDataHouse, houseMax, houseMin)
+      addLine(stateDataHouse, houseMax, houseMin);
+    }
+    else{
+      jselected = true
+      var dates = Object.keys(jobsData)
+      dropDownDate.selectAll("option").data(dates).enter().append("option").text(function(d){return d;}).attr("value", function(d){return d;})
+      createMapAndLegend(us, jobsData[dropDownDate.property('value')], stateDataJobs, jobsMax, jobsMin)
+      addLine(stateDataJobs, jobsMax, jobsMin);
+    }
+  })
+  createMapAndLegend(us, popData[dropDownDate.property('value')], stateDataPop, popMax, popMin)
+}
+function continuous(selector_id, colorscale) {
+  var legendheight = 450,
+      legendwidth = 160,
+      margin = {top: 100, right: 120, bottom: 10, left: 2};
+  d3.select(selector_id).select("#c").remove()
+  d3.select(selector_id).select("#s").remove()
+  var canvas = d3.select(selector_id)
+    .append("canvas")
+    .attr("height", legendheight - margin.top - margin.bottom)
+    .attr("width", 1)
+    .style("height", (legendheight - margin.top - margin.bottom) + "px")
+    .style("width", (legendwidth - margin.left - margin.right) + "px")
+    .style("border", "1px solid #000")
+    .style("position", "absolute")
+    .style("top", (margin.top) + "px")
+    .style("left", (margin.left+1000) + "px").attr("id", "c");
+  var ctx = canvas.node().getContext("2d");
+  var legendscale = d3.scaleLinear()
+    .range([1, legendheight - margin.top - margin.bottom])
+    .domain(colorscale.domain());
+  // image data hackery based on http://bl.ocks.org/mbostock/048d21cf747371b11884f75ad896e5a5
+  var image = ctx.createImageData(1, legendheight);
+  d3.range(legendheight).forEach(function(i) {
+    var c = d3.rgb(colorscale(legendscale.invert(i)));
+    image.data[4*i] = c.r;
+    image.data[4*i + 1] = c.g;
+    image.data[4*i + 2] = c.b;
+    image.data[4*i + 3] = 255;
+  });
+  ctx.putImageData(image, 0, 0);
+  // A simpler way to do the above, but possibly slower. keep in mind the legend width is stretched because the width attr of the canvas is 1
+  // See http://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
+  /*
+  d3.range(legendheight).forEach(function(i) {
+    ctx.fillStyle = colorscale(legendscale.invert(i));
+    ctx.fillRect(0,i,1,1);
+  });
+  */
+  var legendaxis = d3.axisRight()
+    .scale(legendscale)
+    .tickSize(6)
+    .ticks(8);
+  var svg = d3.select(selector_id)
+    .append("svg")
+    .attr("height", (legendheight) + "px")
+    .attr("width", (legendwidth) + "px")
+    .attr("id", "s")
+    .style("position", "absolute")
+    .style("left", "0px")
+    .style("top", "0px")
+  svg.attr("transform", "translate(1000,0)")
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")").style("font-size","16px")
+    .call(legendaxis);
+};
+function createMapAndLegend(us, data, stateData, maxData, minData){
+  svg.remove()
+  svg = d3.select("#choropleth").append("svg").attr("width", width).attr("height", height)
+  var min = Math.min.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+  var max = Math.max.apply(null, Object.keys(data).map(function(x) { return data[x]}))
+  var cScale = d3.scaleSequential(d3.interpolateBlues)
+    .domain([min, max])
+  continuous("#choropleth", cScale)
+  tip.attr('class', 'd3-tip')
+  .offset(function () {
+    return[10,0];
+  })
+  .html(function(d) {
+    return convertFIP_N[parseInt(d.id)] + ": " + d.rate.toString();
+  })
+  svg.call(tip)
+  svg.append("g")
+      .attr("class", "states")
+    .selectAll("path")
+    // .data(topojson.feature(us, us.objects.counties).features)
+    .data(topojson.feature(us, us.objects.states).features)
+    .enter().append("path")
+      .attr("fill", function(d) {
+        // console.log(d);
+        if(stateSelected[parseInt(d.id)]){
+          d.rate = data[parseInt(d.id)]
+          d.click = true
+          return "yellow";
+        }
+        else{
+          return cScale(d.rate = data[parseInt(d.id)]);
+        }
+      })
+      .attr("d", path)
+    .on("mouseover", function(d) {
+      d3.select(this).transition().duration(300).style("opacity", 0.5);
+      tip.show(d)
+    }).on("mouseout", function() {
+      tip.hide()
+      d3.select(this).transition().duration(300).style("opacity", 1);
+    }).on("click", function(d) {
+      if(d.click){
+        d.click = false;
+        d3.select(this).attr("fill",cScale(d.rate = data[parseInt(d.id)]));
+        stateSelected[parseInt(d.id)] = false
+        addLine(stateData, maxData, minData)
+      }
+      else{
+        d.click = true;
+        d3.select(this).attr("fill","yellow");
+        stateSelected[parseInt(d.id)] = true
+        addLine(stateData, maxData, minData)
+      }
+    });
+  svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "states")
+      .attr("d", path);
+}
+function addLine(stateData, maxData, minData){
+  var t = false
+  var states = {}
+  for(i in stateSelected){
+    if(stateSelected[i]){
+      states[i] = convertFIP_N[i]
+      t = true
+    }
+  }
+  d3.select("#graph").select("svg").remove()
+  if(!t){
+    return
+  }
+  var mtop = 50
+  var mbottom = 350
+  var margin = 150;
+  var height = 750;
+  var width = 1200;
+  if(jselected){
+    var parseTime = d3.timeParse("%Y %B");
+  }
+  else{
+    var parseTime = d3.timeParse("%Y");
+  }
+  var date = []
+  for(i=0; i<stateData["Year"].length; i++){
+    date.push(stateData["Year"][i])
+  }
+  var x = d3.scaleTime().range([margin,width-margin]);
+  var y = d3.scaleLinear().range([height-mbottom,mtop]);
+  var xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y"))
+  if(jselected){
+    xAxis = d3.axisBottom().scale(x).tickFormat(d3.timeFormat("%Y %b"))
+  }
+  var yAxis = d3.axisLeft().scale(y)
+  var svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
+  x.domain([parseTime(date[0]),parseTime(date[date.length-1])]);
+  y.domain([minData, maxData]);
+  var c = 0
+  svg = svg.append("g")
+  for(i in states){
+    c ++
+    svg.append("path")
+        .datum(stateData[i])
+        .attr("fill", "none")
+        .attr("stroke", colorScheme(i))
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+          .x(function(d,i) {return x(parseTime(date[i])) })
+          .y(function(d) {return y(d) })
+          )
+    svg.append("circle").attr("cx",width-margin+20).attr("cy",margin + c*20).attr("r", 6).style("fill", colorScheme(i))
+    svg.append("text").attr("x", width-margin+40).attr("y", margin+2+ c*20).text(states[i]).style("font-size", "15px").attr("alignment-baseline","middle")
+  }
+  svg.append("g").attr("id", 'x_axis').attr("transform", "translate(0," + (height - mbottom) + ")").call(xAxis)
+  svg.append("g").attr("transform", "translate(" + margin + ",0)").attr("id", "y_axis").call(yAxis)
