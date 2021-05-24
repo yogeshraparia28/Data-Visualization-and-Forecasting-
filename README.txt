@@ -1,0 +1,13 @@
+Description:
+	The Goal of my project is to create a tool that allows for easy comparison of different data sets for states over different periods of time. There are five different data sets that have been used in order for the user to learn about different aspects of the state. These data sets are population, temperature, jobs added in the state over a quarter, housing price index, and the number of car accidents/severity of accidents in a state. From these different data sets you are able to select any one of them and then a scale of the data is created and the map colors each state according to scale so the user can get a good idea of value of each state and easily compare. There is also a focus on the time series aspect and most of our data spans over a number of years and our project allows for users to switch between the years in order to see the values at different time periods.
+	As for the interactivity of the project our HTML page allows for users to hover over each of the individual state in order to see the exact trend for that state for the dataset and time period selected. It also allows for users to click on and select multiple states in order to get a graph that compares them over the years and even forecasts them into the future. For each of the different data sets, besides car accidents, I used time series data in order to create a forecast five years into the future in order to give the user an idea of the potential for that state into the future. For the car accident data the goal was to focus on identifying the most important features for determining the severity of an accident for each state, which would help state governments get a better idea of which factors influence accidents the most and thus work on improving road safety.
+
+Installation:
+There is no installation, all of the packages are acquired from online or already in the file.
+
+Execution:
+In order to execute the HTML file you can either
+1. Use the following link https://tinyurl.com/2pxcd87m 
+OR
+2. If you would like to run it locally you could open up a terminal in the code folder, run the command "python -m http.server 8000" and in a web browser go to "localhost:8000", then click on project.html in order to run the page.
+In case you want to run the models for time-series or feature data, execute the relevant .R files. Links to the datasets and instructions are enclosed within those files. 
